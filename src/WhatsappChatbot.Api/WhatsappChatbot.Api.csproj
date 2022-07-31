@@ -22,5 +22,13 @@
 
     <ItemGroup>
       <None Remove="FluentScheduler" />
+      <None Remove="Services\Whatsapp\" />
+      <None Remove="Services\OpenAI\" />
+      <None Remove="Services\DataAccess\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Services\Whatsapp\" />
+      <Folder Include="Services\OpenAI\" />
+      <Folder Include="Services\DataAccess\" />
     </ItemGroup>
 </Project>

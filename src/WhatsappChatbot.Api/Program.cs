@@ -98,7 +98,11 @@ app.MapGet("api/sendmessages", async (IScheduledServices scheduledServices ) =>
 
 });
 
+app.MapGet("api/refreshContacts", async (IScheduledServices scheduledServices) =>
+{
+    return Results.Ok();
 
+});
 
 
 
