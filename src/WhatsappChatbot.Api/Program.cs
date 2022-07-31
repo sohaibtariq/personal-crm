@@ -77,6 +77,12 @@ app.MapGet("api/Contacts", async (IPersonalCRMService personalCRMService) =>
 
 });
 
+app.MapGet("api/zz", async ([FromQuery(Name = "message")] string message, [FromQuery(Name = "number")] string number, IWhatsappCloudService whatsappCloudService) =>
+{
+    await whatsappCloudService.SendTextMessage(message, number);
+    return Results.Ok();
+
+});
 
 app.MapGet("api/messages", async (IPersonalCRMService personalCRMService) =>
 {
@@ -91,6 +97,8 @@ app.MapGet("api/sendmessages", async (IScheduledServices scheduledServices ) =>
     return Results.Ok(result);
 
 });
+
+
 
 
 

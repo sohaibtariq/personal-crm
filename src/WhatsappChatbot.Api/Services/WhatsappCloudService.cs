@@ -29,6 +29,7 @@ public class WhatsappCloudService : IWhatsappCloudService
         catch (ApiException ex)
         {
             _logger.LogError(ex, "Unable to receive response from Whatsapp");
+            _logger.LogError(ex.HttpContext.Response.ToString());
             throw;
         }
     }
