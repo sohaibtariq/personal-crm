@@ -14,7 +14,7 @@ namespace WhatsappChatbot.Api.Services
 
  //           Schedule(() => _scheduledServices.SendBirthdayMessage()).ToRunEvery(options.Value.BirthdayMessage).Minutes();
  //           Schedule(() => _scheduledServices.SendTouchPoint()).ToRunEvery(options.Value.Touchpoint).Minutes();
-            Schedule(() => _scheduledServices.SendScheduledMessage()).ToRunEvery(options.Value.ScheduledMessage).Minutes();
+ //           Schedule(() => _scheduledServices.SendScheduledMessage()).ToRunEvery(options.Value.ScheduledMessage).Minutes();
 
         }
     }
