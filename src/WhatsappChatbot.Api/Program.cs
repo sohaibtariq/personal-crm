@@ -39,10 +39,6 @@ var app = builder.Build();
 
 JobManager.Initialize(app.Services.GetService<ScheduleRegistry>());
 
-//JobManager.AddJob(
-//    () => Console.WriteLine("1 minute just passed."),
-//    s => s.ToRunEvery(1).Minutes()
-//);
 
 app.MapGet("api/Webhook", (
         [FromQuery(Name = "hub.mode")] string? hubMode,
@@ -58,72 +54,58 @@ app.MapGet("api/Webhook", (
 });
 
 
-//app.MapPost("api/Webhook", async (
-//        [FromBody] NotificationPayload notification,
-//        IWhatsappCloudService whatsappCloudService, IOpenAiApiService openAiApiService, ILogger<Program> logger)
-//    =>
-//{
-//    foreach (var message in notification.EntryObject.SelectMany(entry =>
-//                 entry.Changes.SelectMany(change => change.Value.Messages)))
-//    {
-//        var responseText = await openAiApiService.CreateCompletion(message.Text.Body);
-//        await whatsappCloudService.SendTextMessage(responseText, message.From);
-//    }
-//});
-
-app.MapGet("api/Contacts", async (IPersonalCRMService personalCRMService) =>
-{ 
-    var contacts = await personalCRMService.GetContacts();
-    return Results.Ok(contacts);
-
-});
-
-app.MapGet("api/zz", async ([FromQuery(Name = "message")] string message, [FromQuery(Name = "number")] string number, IWhatsappCloudService whatsappCloudService) =>
-{
-    await whatsappCloudService.SendTextMessage(message, number);
-    return Results.Ok();
-
-});
-
-app.MapGet("api/messages", async (IPersonalCRMService personalCRMService) =>
-{
-    var messages = await personalCRMService.GetScheduledMessages();
-    return Results.Ok(messages);
-
-});
-
-app.MapGet("api/sendmessages", async (IScheduledServices scheduledServices ) =>
-{
-    var result = await scheduledServices.SendScheduledMessage();
-    return Results.Ok(result);
-
-});
-
 app.MapGet("api/refreshContacts", async (IScheduledServices scheduledServices, IPersonalCRMService personalCrmService) =>
 {
-    scheduledServices
+    scheduledServices.RemoveAllBirthdayJobs();
+    scheduledServices.RemoveAllTouchpointJobs();
 
-    var scheduledMessages = await personalCrmService.GetScheduledMessages();
     var contacts = await personalCrmService.GetContacts();
 
     scheduledServices.ScheduleBirthdayMessages(contacts);
     scheduledServices.ScheduleTouchpoints(contacts);
-    scheduledServices.ScheduleScheduledMessages(scheduledMessages);
     
     return Results.Ok();
 
 });
 
 
-app.MapGet("api/refreshMessages", async (IScheduledServices scheduledServices) =>
+app.MapGet("api/refreshMessages", async (IScheduledServices scheduledServices, IPersonalCRMService personalCrmService) =>
 {
+    scheduledServices.RemoveAllMessageJobs();
+
+    var scheduledMessages = await personalCrmService.GetScheduledMessages();
+    scheduledServices.ScheduleScheduledMessages(scheduledMessages);
+
     return Results.Ok();
 
 });
 
+#region admin endpoints
+
+app.MapGet("api/admin/contacts", async (IPersonalCRMService personalCRMService) =>
+{
+    var contacts = await personalCRMService.GetContacts();
+    return Results.Ok(contacts);
+
+});
+
+app.MapGet("api/admin/testMessage", async ([FromQuery(Name = "message")] string message, [FromQuery(Name = "number")] string number, IWhatsappCloudService whatsappCloudService) =>
+{
+    await whatsappCloudService.SendTextMessage(message, number);
+    return Results.Ok();
+
+});
+
+app.MapGet("api/admin/messages", async (IPersonalCRMService personalCRMService) =>
+{
+    var messages = await personalCRMService.GetScheduledMessages();
+    return Results.Ok(messages);
+});
+
 
 app.Map("/", async (httpContext) =>
-    await httpContext.Response.WriteAsync("APIMatic Whatsapp POC running\n" +
-                                          "For more details Visit https://github.com/apimatic/whatsapp-chatbot"));
+    await httpContext.Response.WriteAsync("Friends and Family is up and running"));
+
+#endregion
 
 app.Run();
