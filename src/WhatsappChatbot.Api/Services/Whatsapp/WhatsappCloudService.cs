@@ -30,7 +30,7 @@ public class WhatsappCloudService : IWhatsappCloudService
         {
             _logger.LogError(ex, "Unable to receive response from Whatsapp");
             _logger.LogError(ex.HttpContext.Response.ToString());
-            throw;
+            
         }
     }
 

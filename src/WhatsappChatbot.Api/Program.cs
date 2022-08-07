@@ -52,28 +52,45 @@ app.MapGet("api/Webhook", (
 
 app.MapGet("api/refreshContacts", async (IScheduledServices scheduledServices, IPersonalCRMService personalCrmService) =>
 {
-    scheduledServices.RemoveAllBirthdayJobs();
-    scheduledServices.RemoveAllTouchpointJobs();
+    try
+    {
+        scheduledServices.RemoveAllBirthdayJobs();
+        scheduledServices.RemoveAllTouchpointJobs();
 
-    var contacts = await personalCrmService.GetContacts();
+        var contacts = await personalCrmService.GetContacts();
 
-    scheduledServices.ScheduleBirthdayMessages(contacts);
-    scheduledServices.ScheduleTouchpoints(contacts);
-    
-    return Results.Ok();
+        scheduledServices.ScheduleBirthdayMessages(contacts);
+        scheduledServices.ScheduleTouchpoints(contacts);
+
+        return Results.Ok();
+    }
+    catch (System.Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+
 
 });
 
 
 app.MapGet("api/refreshMessages", async (IScheduledServices scheduledServices, IPersonalCRMService personalCrmService) =>
 {
-    scheduledServices.RemoveAllMessageJobs();
+    try
+    {
 
-    var scheduledMessages = await personalCrmService.GetScheduledMessages();
-    scheduledServices.ScheduleScheduledMessages(scheduledMessages);
+        scheduledServices.RemoveAllMessageJobs();
 
-    return Results.Ok();
+        var scheduledMessages = await personalCrmService.GetScheduledMessages();
+        scheduledServices.ScheduleScheduledMessages(scheduledMessages);
 
+        return Results.Ok();
+
+
+    }
+    catch (System.Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
 });
 
 #region admin endpoints
