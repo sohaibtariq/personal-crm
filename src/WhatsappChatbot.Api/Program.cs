@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using WhatsappChatbot.Api.Models;
 using PersonalCRM.Standard;
 using FluentScheduler;
+using PersonalCRM.Standard.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,10 +39,10 @@ var app = builder.Build();
 
 JobManager.Initialize(app.Services.GetService<ScheduleRegistry>());
 
-JobManager.AddJob(
-    () => Console.WriteLine("1 minute just passed."),
-    s => s.ToRunEvery(1).Minutes()
-);
+//JobManager.AddJob(
+//    () => Console.WriteLine("1 minute just passed."),
+//    s => s.ToRunEvery(1).Minutes()
+//);
 
 app.MapGet("api/Webhook", (
         [FromQuery(Name = "hub.mode")] string? hubMode,
@@ -98,12 +99,27 @@ app.MapGet("api/sendmessages", async (IScheduledServices scheduledServices ) =>
 
 });
 
-app.MapGet("api/refreshContacts", async (IScheduledServices scheduledServices) =>
+app.MapGet("api/refreshContacts", async (IScheduledServices scheduledServices, IPersonalCRMService personalCrmService) =>
 {
+    scheduledServices
+
+    var scheduledMessages = await personalCrmService.GetScheduledMessages();
+    var contacts = await personalCrmService.GetContacts();
+
+    scheduledServices.ScheduleBirthdayMessages(contacts);
+    scheduledServices.ScheduleTouchpoints(contacts);
+    scheduledServices.ScheduleScheduledMessages(scheduledMessages);
+    
     return Results.Ok();
 
 });
 
+
+app.MapGet("api/refreshMessages", async (IScheduledServices scheduledServices) =>
+{
+    return Results.Ok();
+
+});
 
 
 app.Map("/", async (httpContext) =>
