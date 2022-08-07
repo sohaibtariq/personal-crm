@@ -8,7 +8,6 @@
   </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\plugins\OpenAIAPI\OpenAIAPI.Standard\OpenAIAPI.Standard.csproj" />
         <ProjectReference Include="..\..\plugins\WhatsAppCloudAPI\WhatsAppCloudAPI.Standard\WhatsAppCloudAPI.Standard.csproj" />
         <ProjectReference Include="..\..\Personal CRM-CS_NET_STANDARD_LIB\PersonalCRM.Standard\PersonalCRM.Standard.csproj">
           <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
@@ -23,12 +22,10 @@
     <ItemGroup>
       <None Remove="FluentScheduler" />
       <None Remove="Services\Whatsapp\" />
-      <None Remove="Services\OpenAI\" />
       <None Remove="Services\DataAccess\" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Services\Whatsapp\" />
-      <Folder Include="Services\OpenAI\" />
       <Folder Include="Services\DataAccess\" />
     </ItemGroup>
 </Project>

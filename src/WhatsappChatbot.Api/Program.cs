@@ -1,4 +1,3 @@
-using OpenAIAPI.Standard;
 using WhatsappChatbot.Api.Services;
 using WhatsAppCloudAPI.Standard;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +9,7 @@ using PersonalCRM.Standard.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<WhatsappConfig>(builder.Configuration.GetSection("Whatsapp"));
-builder.Services.Configure<OpenAIConfig>(builder.Configuration.GetSection("OpenAI"));
 builder.Services.Configure<ScheduledTaskConfig>(builder.Configuration.GetSection("SchedluedTasks"));
-
-builder.Services.AddSingleton<OpenAIAPIClient>(_ =>
-    new OpenAIAPIClient.Builder()
-        .AccessToken(builder.Configuration.GetValue<string>("OpenAI:AccessToken"))
-        .Build());
 
 builder.Services.AddSingleton<WhatsAppCloudAPIClient>(_ =>
     new WhatsAppCloudAPIClient.Builder()
@@ -29,7 +22,6 @@ builder.Services.AddSingleton<PersonalCRMClient>(_ =>
     .HttpClientConfig(config => config.NumberOfRetries(0))
     .Build());
 
-builder.Services.AddSingleton<IOpenAiApiService, OpenAiApiService>();
 builder.Services.AddSingleton<IWhatsappCloudService, WhatsappCloudService>();
 builder.Services.AddSingleton<IPersonalCRMService, PersonalCRMService>();
 builder.Services.AddSingleton<IScheduledServices, ScheduledServices>();
