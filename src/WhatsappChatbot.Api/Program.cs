@@ -36,8 +36,12 @@ builder.Services.AddSingleton<IScheduledServices, ScheduledServices>();
 builder.Services.AddSingleton<ScheduleRegistry>();
 
 var app = builder.Build();
+app.UseHttpLogging();
 
 JobManager.Initialize(app.Services.GetService<ScheduleRegistry>());
+JobManager.JobException += info => app.Logger.LogError("An error just happened with a scheduled job: " + info.Exception);
+JobManager.JobStart += info => app.Logger.LogInformation($"{info.Name}: started");
+JobManager.JobEnd += info => app.Logger.LogInformation($"{info.Name}: ended ({info.Duration})");
 
 
 app.MapGet("api/Webhook", (
@@ -101,11 +105,11 @@ app.MapGet("api/admin/messages", async (IPersonalCRMService personalCRMService) 
     var messages = await personalCRMService.GetScheduledMessages();
     return Results.Ok(messages);
 });
-
+#endregion
 
 app.Map("/", async (httpContext) =>
     await httpContext.Response.WriteAsync("Friends and Family is up and running"));
 
-#endregion
+
 
 app.Run();

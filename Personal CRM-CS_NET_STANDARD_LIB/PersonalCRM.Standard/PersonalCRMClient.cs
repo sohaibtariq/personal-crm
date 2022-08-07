@@ -26,7 +26,7 @@ namespace PersonalCRM.Standard
             {
                 Environment.Production, new Dictionary<Server, string>
                 {
-                    { Server.Server1, "https://sheet2api.com/v1/lhGDwgER3avV" },
+                    { Server.Server1, "https://sheet2api.com/v1/IDlCLHnjRH64" }, 
                 }
             },
         };
