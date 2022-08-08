@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FluentScheduler;
 using PersonalCRM.Standard.Models;
 
@@ -29,7 +29,7 @@ namespace WhatsappChatbot.Api.Services
             {
 
                 JobManager.AddJob(
-                    async() => await SendTouchPoint(contact),
+                    () => SendTouchPoint(contact),
                     s => s.WithName($"touchpoint_{contact.Number}").ToRunEvery(contact.Cadence).Days()
                 );
             }
@@ -37,13 +37,14 @@ namespace WhatsappChatbot.Api.Services
         }
 
 
-        private async Task SendTouchPoint(Contact contact)
+        private void SendTouchPoint(Contact contact)
         {
-            
                 var touchpointMessage = TouchpointMessage(contact.Name);
-                await _whatsappCloudService.SendTextMessage(touchpointMessage, contact.Number.ToString());
 
-                await UpdateLastContact(contact);
+                //NOTE: scheduling async tasks are problematic with Fluentscheduler, so making the method synchronous for now
+                _whatsappCloudService.SendTextMessage(touchpointMessage, contact.Number.ToString()).GetAwaiter().GetResult();
+
+                UpdateLastContact(contact).GetAwaiter().GetResult();
 
 
         }
@@ -60,7 +61,7 @@ namespace WhatsappChatbot.Api.Services
             {
 
                 JobManager.AddJob(
-                    async () => await SendBirthdayMessage(contact),
+                    () => SendBirthdayMessage(contact),
                     s => s.WithName($"birthday_{contact.Number}").ToRunOnceAt(contact.Birthday).AndEvery(12).Months()
                 );
             }
@@ -69,12 +70,12 @@ namespace WhatsappChatbot.Api.Services
 
 
 
-        private async Task SendBirthdayMessage(Contact contact)
+        private void SendBirthdayMessage(Contact contact)
         {
                 var birthdayMessage = BirthdayMessage(contact.Name);
-                await _whatsappCloudService.SendTextMessage(birthdayMessage, contact.Number.ToString());
+                _whatsappCloudService.SendTextMessage(birthdayMessage, contact.Number.ToString()).GetAwaiter().GetResult();
 
-                await UpdateLastContact(contact);
+                 UpdateLastContact(contact).GetAwaiter().GetResult();
 
         }
 
@@ -90,18 +91,18 @@ namespace WhatsappChatbot.Api.Services
             {
 
                 JobManager.AddJob(
-                    async () => await SendScheduledMessage(message),
+                    () => SendScheduledMessage(message),
                     s => s.WithName($"message_{message.Number}_{message.Id}").ToRunOnceAt(message.Timestamp)
                 );
             }
 
         }
 
-        private async Task SendScheduledMessage(ScheduledMessage message)
+        private void SendScheduledMessage(ScheduledMessage message)
         {
           
-                await _whatsappCloudService.SendTextMessage(message.Message, message.Number);
-                await _personalCRMService.DeleteScheduledMessage(message.Id);
+                _whatsappCloudService.SendTextMessage(message.Message, message.Number).GetAwaiter().GetResult();
+                _personalCRMService.DeleteScheduledMessage(message.Id).GetAwaiter().GetResult();
 
                 //var contact = contacts.Where(contact => contact.Number.Equals(message.Number))
                 //    .FirstOrDefault();
